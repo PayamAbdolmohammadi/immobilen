@@ -33,5 +33,11 @@ jobs:
       - name: Run migrations
         run: docker compose exec -T app php artisan migrate --force
 
+      - name: Install Node dependencies
+        run: npm ci
+
+      - name: Build frontend assets
+        run: npm run build
+
       - name: Run tests
         run: docker compose exec -T app php artisan test
