@@ -1,62 +1,115 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Immobile
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Web application for **German-style rental and property operations** (objects, units, leases, operating cost settlements, bank matching, invoices, and tenant-facing flows). Built with **Laravel 13**, **PHP 8.3**, **Vite**, **Tailwind CSS**, and **Alpine.js**. Default locale and copy are **German** (`de` / `de_DE`).
 
-## About Laravel
+## Features
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+| Area | What you get |
+|------|----------------|
+| **Portfolio** | Tenants (`Mieter`), buildings (`Objekte`), units (`Einheiten`), rental agreements (`Mietvertraege`) with PDF contract links and public acceptance URLs (`/contracts/{token}`). |
+| **Billing** | Monthly rent runs, manual invoices, reminders (`Mahnung`), storno, operating-cost settlements (`NK-Abrechnungen`) with PDF export. |
+| **Bank** | CSV import, open transactions, allocation / matching to tenants and invoices. |
+| **Exports** | Accounting exports (simple CSV and DATEV-oriented CSV) for owners (`/export/accounting`). |
+| **Tenant portal** | Separate area under `/portal` (guard `mieter`) for tenant login and dashboard. |
+| **WOW demo** | Guided demo for **property owners** at **`/demo-flow`**: auto demo steps, sample bank CSV, rent generation helpers (requires owner role and completed mandant setup). |
+| **Onboarding** | After registration, users complete **mandant** setup (`/mandant/einrichten`) before the main app routes unlock. |
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+Authentication for staff uses **Laravel Breeze** (email verification required for the main app). PDFs use **barryvdh/laravel-dompdf**.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Requirements
 
-## WOW demo (property management / Hausverwaltung)
+- **PHP** ^8.3 with usual Laravel extensions (mbstring, openssl, pdo, etc.)
+- **Composer** 2.x  
+- **Node.js** and **npm** (for Vite / frontend build)
 
-Guided **2–3 minute** walkthrough for owners: open **`/demo-flow`** (navigation label **WOW demo**). Checklist, seeded demo login, and CSV hints: **[docs/WOW_DEMO.md](docs/WOW_DEMO.md)**.
+Default database in `.env.example` is **SQLite**; you can switch to MySQL/PostgreSQL via `DB_*` variables.
 
-## Learning Laravel
-
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
-
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
-
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
-
-## Agentic Development
-
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+## Quick start
 
 ```bash
-composer require laravel/boost --dev
+git clone git@github.com:PayamAbdolmohammadi/immobilen.git
+cd immobilen
 
-php artisan boost:install
+# One-shot: install deps, .env, key, migrate, npm install + build
+composer run setup
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+Then start the stack for local development (HTTP server, queue worker, logs, Vite):
 
-## Contributing
+```bash
+composer run dev
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Open **http://127.0.0.1:8000** (or the URL shown by `artisan serve`).
 
-## Code of Conduct
+### Manual setup (alternative)
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+```bash
+composer install
+cp .env.example .env
+php artisan key:generate
+touch database/database.sqlite   # if using SQLite
+php artisan migrate
+npm install
+npm run dev                      # terminal 1 — Vite
+php artisan serve                # terminal 2 — app
+```
 
-## Security Vulnerabilities
+If you use queues or scheduled jobs in production, run a **queue worker** (`php artisan queue:work`) and configure a **scheduler** cron for `php artisan schedule:run`.
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## Demo data (local / staging)
+
+Seed the database (includes demo mandant, bank lines, leases, etc.):
+
+```bash
+php artisan db:seed
+```
+
+**Staff (Breeze) demo login** (from `DemoDataSeeder`):
+
+- Email: `demo@example.com`  
+- Password: `password`
+
+Use only on trusted environments; change or remove demo users in production.
+
+## Useful URLs
+
+| URL | Purpose |
+|-----|---------|
+| `/` | Product landing / welcome |
+| `/register`, `/login` | Staff account (Breeze) |
+| `/mandant/einrichten` | First-time mandant setup (authenticated, before full app) |
+| `/dashboard` | Main app home (after email verified + mandant) |
+| `/portal/login` | Tenant portal login |
+| `/demo-flow` | WOW demo checklist (owner-only) |
+| `/contracts/{token}` | Public contract view (48-char hex token) |
+
+## Tests
+
+```bash
+composer test
+```
+
+Runs `php artisan test` after clearing config cache.
+
+## Project layout (high level)
+
+- `app/Http/Controllers` — HTTP layer (resources, portal, bank, exports, demo flow).
+- `app/Domain` — Billing and domain services where extracted.
+- `resources/views` — Blade UI (German strings).
+- `routes/web.php` — Primary web routes.
+- `database/migrations`, `database/seeders` — Schema and demo seeds.
+
+## Documentation in this repo
+
+- [docs/PHASE_2_TECHNIK_CHECKLISTE.md](docs/PHASE_2_TECHNIK_CHECKLISTE.md) — technical checklist (phase 2).
+
+## Configuration notes
+
+- **Timezone:** `Europe/Berlin` in `.env.example`.
+- **Session / cache / queue:** defaults point at **database** drivers; ensure migrations have been run.
+- **Mail:** `log` driver in `.env.example` — suitable for local dev only.
 
 ## License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+The Laravel framework and this application’s original Laravel-scaffolded portions are open source under the [MIT license](https://opensource.org/licenses/MIT). Third-party packages retain their respective licenses.
