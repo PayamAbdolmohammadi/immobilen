@@ -15,6 +15,9 @@ jobs:
       - name: Create env file
         run: cp .env.example .env
 
+      - name: Add CI app key
+        run: echo "APP_KEY=base64:U2VjcmV0S2V5Rm9yQ0lUZXN0c09ubHkxMjM0NTY3ODkwMTI=" >> .env
+
       - name: Build Docker containers
         run: docker compose build
 
