@@ -3,7 +3,6 @@ name: CI
 on:
   push:
     branches: [ master ]
-  pull_request:
 
 jobs:
   tests:
@@ -17,10 +16,16 @@ jobs:
         run: docker compose build
 
       - name: Start Docker containers
-        run: docker compose up -d mysql redis app
+        run: docker compose up -d
 
       - name: Wait for MySQL
         run: sleep 20
+
+      - name: Install dependencies inside container
+        run: docker compose exec -T app composer install --no-interaction --optimize-autoloader
+
+      - name: Generate app key
+        run: docker compose exec -T app php artisan key:generate
 
       - name: Run migrations
         run: docker compose exec -T app php artisan migrate --force
