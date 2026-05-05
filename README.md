@@ -1,5 +1,11 @@
 # Immobile
 
+[![CI](https://github.com/PayamAbdolmohammadi/immobile/actions/workflows/ci.yml/badge.svg)](https://github.com/PayamAbdolmohammadi/immobile/actions/workflows/ci.yml)
+[![Website](https://img.shields.io/website?url=https%3A%2F%2Fimmobilen.payamdev.de&label=production&up_message=online&down_message=offline)](https://immobilen.payamdev.de)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](https://opensource.org/licenses/MIT)
+![PHP](https://img.shields.io/badge/PHP-8.3%2B-777BB4?logo=php&logoColor=white)
+![Laravel](https://img.shields.io/badge/Laravel-13-FF2D20?logo=laravel&logoColor=white)
+
 Web application for **German-style rental and property operations** (objects, units, leases, operating cost settlements, bank matching, invoices, and tenant-facing flows). Built with **Laravel 13**, **PHP 8.3**, **Vite**, **Tailwind CSS**, and **Alpine.js**. Default locale and copy are **German** (`de` / `de_DE`).
 
 ## Features
@@ -99,6 +105,28 @@ Runs `php artisan test` after clearing config cache.
 - `resources/views` — Blade UI (German strings).
 - `routes/web.php` — Primary web routes.
 - `database/migrations`, `database/seeders` — Schema and demo seeds.
+
+## Architecture (production / Docker)
+
+```mermaid
+flowchart TB
+  U[Users (Landlords & Tenants)] -->|HTTPS| N[Nginx (Reverse Proxy)]
+  N -->|FastCGI| A[Laravel App (PHP-FPM)]
+
+  A --> DB[(MySQL)]
+  A --> R[(Redis)]
+
+  Q[Queue Worker<br/>php artisan queue:work] --> R
+  Q --> DB
+  Q --> A
+
+  S[Scheduler<br/>php artisan schedule:run] --> A
+
+  A --- P[/Tenant portal<br/>/portal (guard: mieter)/]
+  A --- D[/Main app<br/>/dashboard (Breeze + email verify)/]
+  A --- DEMO[/Demo flow<br/>/demo-flow/]
+  A --- PUB[/Public contract<br/>/contracts/{token}/]
+```
 
 ## Documentation in this repo
 
