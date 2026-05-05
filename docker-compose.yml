@@ -42,38 +42,6 @@ services:
     image: redis:alpine
     container_name: immobile-redis
     restart: unless-stopped
-    ports:
-      - "6379:6379"
-
-  queue:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: immobile-queue
-    restart: unless-stopped
-    working_dir: /var/www/html
-    command: php artisan queue:work --sleep=3 --tries=3
-    volumes:
-      - .:/var/www/html
-    depends_on:
-      - app
-      - redis
-      - mysql
-
-  scheduler:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: immobile-scheduler
-    restart: unless-stopped
-    working_dir: /var/www/html
-    command: sh -c "while true; do php artisan schedule:run; sleep 60; done"
-    volumes:
-      - .:/var/www/html
-    depends_on:
-      - app
-      - mysql
-      - redis
 
 volumes:
   immobile_mysql:
