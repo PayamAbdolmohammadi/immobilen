@@ -6,27 +6,51 @@
 ![PHP](https://img.shields.io/badge/PHP-8.3%2B-777BB4?logo=php&logoColor=white)
 ![Laravel](https://img.shields.io/badge/Laravel-13-FF2D20?logo=laravel&logoColor=white)
 
-Web application for **German-style rental and property operations** (objects, units, leases, operating cost settlements, bank matching, invoices, and tenant-facing flows). Built with **Laravel 13**, **PHP 8.3**, **Vite**, **Tailwind CSS**, and **Alpine.js**. Default locale and copy are **German** (`de` / `de_DE`).
+Production-ready SaaS platform for managing **German-style rental & property operations** — tenants, leases, automated billing, operating cost settlements, bank matching, and tenant-facing workflows.
 
-## Features
+Built with a modern full-stack architecture:
 
-| Area | What you get |
-|------|----------------|
-| **Portfolio** | Tenants (`Mieter`), buildings (`Objekte`), units (`Einheiten`), rental agreements (`Mietvertraege`) with PDF contract links and public acceptance URLs (`/contracts/{token}`). |
-| **Billing** | Monthly rent runs, manual invoices, reminders (`Mahnung`), storno, operating-cost settlements (`NK-Abrechnungen`) with PDF export. |
-| **Bank** | CSV import, open transactions, allocation / matching to tenants and invoices. |
-| **Exports** | Accounting exports (simple CSV and DATEV-oriented CSV) for owners (`/export/accounting`). |
-| **Tenant portal** | Separate area under `/portal` (guard `mieter`) for tenant login and dashboard. |
-| **WOW demo** | Guided demo for **property owners** at **`/demo-flow`**: auto demo steps, sample bank CSV, rent generation helpers (requires owner role and completed mandant setup). |
-| **Onboarding** | After registration, users complete **mandant** setup (`/mandant/einrichten`) before the main app routes unlock. |
+- **Laravel 13** (PHP 8.3)
+- **MySQL / SQLite**
+- **Vite + Tailwind CSS + Alpine.js**
+- **Docker + Nginx**
+- **AWS EC2 + Let’s Encrypt SSL**
 
-Authentication for staff uses **Laravel Breeze** (email verification required for the main app). PDFs use **barryvdh/laravel-dompdf**.
+Default locale and UI language: **German** (`de_DE`).
+
+## Product vision
+
+> „Die Miete läuft automatisch.“
+
+Immobile turns rental contracts into an automated cashflow engine: recurring rent runs, tracking, reminders, and clear landlord/tenant workflows.
+
+## Core features
+
+| Area | Description |
+|------|-------------|
+| **Portfolio management** | Tenants (`Mieter`), properties (`Objekte`), units (`Einheiten`), rental agreements (`Mietverträge`) including PDF contract links + public acceptance (`/contracts/{token}`). |
+| **Billing engine** | Automated monthly rent generation, invoices, reminders (`Mahnung`), cancellations (`Storno`). |
+| **Operating costs (NK)** | Full Nebenkostenabrechnung workflow with PDF export. |
+| **Bank integration** | CSV import + transaction matching to invoices and tenants. |
+| **Accounting export** | Simple CSV + DATEV-oriented export. |
+| **Tenant portal** | Dedicated `/portal` area with separate guard (`mieter`), dashboard, and document access. |
+| **Demo flow** | Guided landlord demo under `/demo-flow`. |
+| **Onboarding** | Mandatory mandant setup before the full system unlocks (`/mandant/einrichten`). |
+
+## Authentication
+
+- **Staff**: Laravel Breeze
+- **Email verification** required for the main app
+- **Tenant portal**: separate guard (`mieter`)
+
+PDF generation uses **barryvdh/laravel-dompdf**.
 
 ## Requirements
 
 - **PHP** ^8.3 with usual Laravel extensions (mbstring, openssl, pdo, etc.)
 - **Composer** 2.x  
 - **Node.js** and **npm** (for Vite / frontend build)
+- **MySQL** (optional) or **SQLite** (default)
 
 Default database in `.env.example` is **SQLite**; you can switch to MySQL/PostgreSQL via `DB_*` variables.
 
@@ -40,7 +64,7 @@ cd immobilen
 composer run setup
 ```
 
-Then start the stack for local development (HTTP server, queue worker, logs, Vite):
+Then start the local dev stack (HTTP server + Vite):
 
 ```bash
 composer run dev
@@ -61,6 +85,18 @@ npm run dev                      # terminal 1 — Vite
 php artisan serve                # terminal 2 — app
 ```
 
+## Docker (production-like)
+
+Start the production stack with Docker + Nginx:
+
+```bash
+docker compose up -d --build
+```
+
+Local URL (default): **http://127.0.0.1:8080**
+
+Production URL: `https://immobilen.payamdev.de`
+
 If you use queues or scheduled jobs in production, run a **queue worker** (`php artisan queue:work`) and configure a **scheduler** cron for `php artisan schedule:run`.
 
 ## Demo data (local / staging)
@@ -78,17 +114,15 @@ php artisan db:seed
 
 Use only on trusted environments; change or remove demo users in production.
 
-## Useful URLs
+## Important routes
 
-| URL | Purpose |
-|-----|---------|
-| `/` | Product landing / welcome |
-| `/register`, `/login` | Staff account (Breeze) |
-| `/mandant/einrichten` | First-time mandant setup (authenticated, before full app) |
-| `/dashboard` | Main app home (after email verified + mandant) |
+| Route | Purpose |
+|------|---------|
+| `/` | Landing page |
+| `/dashboard` | Main application |
 | `/portal/login` | Tenant portal login |
-| `/demo-flow` | WOW demo checklist (owner-only) |
-| `/contracts/{token}` | Public contract view (48-char hex token) |
+| `/demo-flow` | Guided product demo |
+| `/contracts/{token}` | Public contract page (48-char hex token) |
 
 ## Tests
 
@@ -98,7 +132,7 @@ composer test
 
 Runs `php artisan test` after clearing config cache.
 
-## Project layout (high level)
+## Project structure (high level)
 
 - `app/Http/Controllers` — HTTP layer (resources, portal, bank, exports, demo flow).
 - `app/Domain` — Billing and domain services where extracted.
@@ -106,7 +140,7 @@ Runs `php artisan test` after clearing config cache.
 - `routes/web.php` — Primary web routes.
 - `database/migrations`, `database/seeders` — Schema and demo seeds.
 
-## Architecture (production / Docker)
+## Architecture (production)
 
 ```mermaid
 flowchart TB
@@ -128,15 +162,23 @@ flowchart TB
   A --- PUB[/Public contract<br/>/contracts/{token}/]
 ```
 
-## Documentation in this repo
+## Deployment
 
-- [docs/PHASE_2_TECHNIK_CHECKLISTE.md](docs/PHASE_2_TECHNIK_CHECKLISTE.md) — technical checklist (phase 2).
+- AWS EC2
+- Docker containers
+- Nginx reverse proxy
+- Let’s Encrypt SSL
+- Custom domain (IONOS DNS)
 
 ## Configuration notes
 
 - **Timezone:** `Europe/Berlin` in `.env.example`.
 - **Session / cache / queue:** defaults point at **database** drivers; ensure migrations have been run.
 - **Mail:** `log` driver in `.env.example` — suitable for local dev only.
+
+## Documentation
+
+- [docs/PHASE_2_TECHNIK_CHECKLISTE.md](docs/PHASE_2_TECHNIK_CHECKLISTE.md)
 
 ## License
 
