@@ -1,0 +1,12 @@
+This is a multi-tenant Laravel SaaS project.
+
+Tenant isolation rules:
+
+- Always respect mandant_id.
+- Never query tenant-owned data without tenant scope.
+- Never expose data from one tenant to another tenant.
+- Controllers must only access records owned by the authenticated tenant.
+- Services must preserve tenant context.
+- Jobs must receive and use the correct tenant or mandant context.
+- Tests should cover tenant isolation for important features.
+- Avoid using Model::all() on tenant-owned models.
