@@ -77,6 +77,36 @@ class ContractPhase8Test extends TestCase
     }
 
     #[Test]
+    public function public_contract_pdf_returns_404_when_contract_pdf_path_is_null(): void
+    {
+        Storage::fake('local');
+
+        $user = User::factory()->create();
+        $lease = $this->createLease($user, Mietvertrag::STATUS_DRAFT);
+        $lease->update(['contract_pdf_path' => null]);
+
+        $plain = (new ContractLinkService)->createToken($lease);
+
+        $this->get(route('contracts.public.pdf', ['token' => $plain]))->assertNotFound();
+    }
+
+    #[Test]
+    public function public_contract_pdf_returns_404_when_file_is_missing(): void
+    {
+        Storage::fake('local');
+
+        $user = User::factory()->create();
+        $lease = $this->createLease($user, Mietvertrag::STATUS_DRAFT);
+
+        $missingPath = sprintf('contracts/%d/%d-missing.pdf', $lease->mandant_id, $lease->id);
+        $lease->update(['contract_pdf_path' => $missingPath]);
+
+        $plain = (new ContractLinkService)->createToken($lease);
+
+        $this->get(route('contracts.public.pdf', ['token' => $plain]))->assertNotFound();
+    }
+
+    #[Test]
     public function owner_post_create_link_logs_contract_event(): void
     {
         $user = User::factory()->create();
