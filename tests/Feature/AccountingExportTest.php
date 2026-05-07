@@ -26,6 +26,19 @@ class AccountingExportTest extends TestCase
             ->assertForbidden();
     }
 
+    public function test_staff_cannot_post_accounting_export_routes(): void
+    {
+        $staff = User::factory()->staff()->create();
+
+        $this->actingAs($staff)
+            ->post(route('export.accounting.simple-csv'), ['year' => 2026])
+            ->assertForbidden();
+
+        $this->actingAs($staff)
+            ->post(route('export.accounting.datev-csv'), ['year' => 2026, 'chart_of_accounts' => 'SKR03'])
+            ->assertForbidden();
+    }
+
     public function test_owner_can_access_accounting_export_page(): void
     {
         $user = User::factory()->create();

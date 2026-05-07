@@ -31,6 +31,23 @@ class DemoFlowTest extends TestCase
         $this->actingAs($staff)->get(route('demo-flow.index'))->assertForbidden();
     }
 
+    public function test_staff_cannot_post_demo_flow_routes(): void
+    {
+        $staff = User::factory()->staff()->create();
+
+        $this->actingAs($staff)
+            ->post(route('demo-flow.start-auto'))
+            ->assertForbidden();
+
+        $this->actingAs($staff)
+            ->post(route('demo-flow.generate-rent'), ['period' => '2026-05'])
+            ->assertForbidden();
+
+        $this->actingAs($staff)
+            ->post(route('demo-flow.seed-bank-line'))
+            ->assertForbidden();
+    }
+
     public function test_owner_can_access_demo_flow(): void
     {
         $owner = User::factory()->create();
