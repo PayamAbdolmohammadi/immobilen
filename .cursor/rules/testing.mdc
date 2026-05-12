@@ -1,0 +1,10 @@
+Testing rules:
+
+- Use PHPUnit tests.
+- Add feature tests for important flows.
+- Cover validation errors.
+- Cover unauthorized access.
+- Cover tenant isolation.
+- Add regression tests for fixed bugs.
+- Keep tests readable and realistic.
+- Do not remove existing tests unless clearly obsolete.

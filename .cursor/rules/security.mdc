@@ -1,0 +1,11 @@
+Security rules:
+
+- Validate all user input.
+- Never trust request data directly.
+- Use authorization checks for protected actions.
+- Avoid mass assignment vulnerabilities.
+- Never expose .env values, secrets, API keys or credentials.
+- Do not log sensitive payment, tenant or personal data.
+- Prevent cross-tenant data leaks.
+- Check file uploads carefully.
+- Prefer explicit allow-lists over broad access.

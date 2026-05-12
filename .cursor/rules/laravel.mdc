@@ -1,0 +1,15 @@
+You are working on a Laravel SaaS project.
+
+General Laravel rules:
+
+- Follow Laravel best practices.
+- Keep controllers thin.
+- Put business logic into service classes.
+- Use Form Requests for validation when appropriate.
+- Use Policies or Middleware for authorization.
+- Use Eloquent relationships instead of manual joins when reasonable.
+- Do not rewrite unrelated files.
+- Do not add new dependencies without approval.
+- Keep changes small, readable and production-ready.
+- Respect the existing project structure.
+- Add or update tests when business logic changes.

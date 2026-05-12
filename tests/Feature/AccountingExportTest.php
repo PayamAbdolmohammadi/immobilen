@@ -3,9 +3,12 @@
 namespace Tests\Feature;
 
 use App\Models\Mandant;
+use App\Models\BankImport;
+use App\Models\BankTransaction;
 use App\Models\Mieter;
 use App\Models\Rechnung;
 use App\Models\User;
+use App\Models\Zahlungszuordnung;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -20,6 +23,19 @@ class AccountingExportTest extends TestCase
 
         $this->actingAs($user)
             ->get(route('export.accounting.index'))
+            ->assertForbidden();
+    }
+
+    public function test_staff_cannot_post_accounting_export_routes(): void
+    {
+        $staff = User::factory()->staff()->create();
+
+        $this->actingAs($staff)
+            ->post(route('export.accounting.simple-csv'), ['year' => 2026])
+            ->assertForbidden();
+
+        $this->actingAs($staff)
+            ->post(route('export.accounting.datev-csv'), ['year' => 2026, 'chart_of_accounts' => 'SKR03'])
             ->assertForbidden();
     }
 
@@ -266,6 +282,110 @@ class AccountingExportTest extends TestCase
         $ids = $this->datevCsvInvoiceIds($datev);
         $this->assertContains((string) $invOpen->id, $ids);
         $this->assertNotContains((string) $invStorno->id, $ids);
+    }
+
+    public function test_datev_export_contains_only_invoices_of_current_mandant(): void
+    {
+        $owner = User::factory()->create();
+        $mieterOwn = Mieter::factory()->create(['mandant_id' => $owner->mandant_id]);
+        $invOwn = $this->makeInvoice($owner->mandant_id, $mieterOwn->id, [
+            'betrag_cent' => 12_345,
+            'status' => Rechnung::STATUS_BEZAHLT,
+            'bezahlt_am' => now(),
+        ]);
+
+        $otherMandant = Mandant::factory()->create();
+        $mieterOther = Mieter::factory()->create(['mandant_id' => $otherMandant->id]);
+        $invOther = $this->makeInvoice($otherMandant->id, $mieterOther->id, [
+            'betrag_cent' => 99_99,
+            'status' => Rechnung::STATUS_BEZAHLT,
+            'bezahlt_am' => now(),
+        ]);
+
+        $year = (int) $invOwn->created_at->format('Y');
+        $invOther->timestamps = false;
+        $invOther->forceFill([
+            'created_at' => Carbon::create($year, 6, 15, 12, 0, 0),
+            'updated_at' => Carbon::create($year, 6, 15, 12, 0, 0),
+        ])->save();
+
+        $datev = $this->actingAs($owner)
+            ->post(route('export.accounting.datev-csv'), [
+                'year' => $year,
+                'chart_of_accounts' => 'SKR03',
+            ])
+            ->assertOk()
+            ->streamedContent();
+
+        $ids = $this->datevCsvInvoiceIds($datev);
+        $this->assertContains((string) $invOwn->id, $ids);
+        $this->assertNotContains((string) $invOther->id, $ids);
+    }
+
+    public function test_simple_export_does_not_leak_banktext_from_other_mandant(): void
+    {
+        $owner = User::factory()->create();
+        $mieterOwn = Mieter::factory()->create(['mandant_id' => $owner->mandant_id]);
+        $invOwn = $this->makeInvoice($owner->mandant_id, $mieterOwn->id, [
+            'betrag_cent' => 11_100,
+            'status' => Rechnung::STATUS_OFFEN,
+        ]);
+
+        $otherMandant = Mandant::factory()->create();
+        $mieterOther = Mieter::factory()->create(['mandant_id' => $otherMandant->id]);
+        $invOther = $this->makeInvoice($otherMandant->id, $mieterOther->id, [
+            'betrag_cent' => 22_200,
+            'status' => Rechnung::STATUS_OFFEN,
+        ]);
+
+        $marker = 'LEAK_MARKER_' . $invOther->id;
+
+        $importOther = BankImport::query()->create([
+            'mandant_id' => $otherMandant->id,
+            'original_filename' => 'leak.csv',
+            'csv_profile' => null,
+            'row_count' => 1,
+            'status' => BankImport::STATUS_COMPLETED,
+            'error_message' => null,
+        ]);
+
+        $txOther = BankTransaction::query()->create([
+            'mandant_id' => $otherMandant->id,
+            'bank_import_id' => $importOther->id,
+            'buchungsdatum' => now()->startOfDay(),
+            'betrag_cent' => 22_200,
+            'gegenpartei' => null,
+            'verwendungszweck' => $marker,
+            'raw_row' => null,
+            'status' => BankTransaction::STATUS_OFFEN,
+        ]);
+
+        Zahlungszuordnung::query()->create([
+            'mandant_id' => $otherMandant->id,
+            'bank_transaction_id' => $txOther->id,
+            'rechnung_id' => $invOther->id,
+            'betrag_cent' => 22_200,
+        ]);
+
+        $year = (int) $invOwn->created_at->format('Y');
+        $invOther->timestamps = false;
+        $invOther->forceFill([
+            'created_at' => Carbon::create($year, 6, 15, 12, 0, 0),
+            'updated_at' => Carbon::create($year, 6, 15, 12, 0, 0),
+        ])->save();
+
+        $body = $this->actingAs($owner)
+            ->post(route('export.accounting.simple-csv'), [
+                'year' => $year,
+            ])
+            ->assertOk()
+            ->streamedContent();
+
+        $invoiceNumbers = $this->simpleCsvInvoiceNumbers($body);
+        $this->assertContains((string) $invOwn->id, $invoiceNumbers);
+        $this->assertNotContains((string) $invOther->id, $invoiceNumbers);
+
+        $this->assertStringNotContainsString($marker, $body);
     }
 
     public function test_datev_csv_contains_netto_steuer_brutto_headers(): void
