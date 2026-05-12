@@ -1,7 +1,12 @@
 <div class="flex h-16 shrink-0 items-center gap-2 border-b border-gray-100 px-4">
-    <a href="{{ route('dashboard') }}" class="flex min-w-0 flex-1 items-center gap-2 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2">
-        <x-application-logo class="h-8 w-auto shrink-0 fill-current text-gray-900" />
-        <span class="truncate text-sm font-semibold text-gray-950">{{ config('app.name', 'ImmoMandat') }}</span>
+    <a href="{{ route('dashboard') }}" class="flex min-w-0 flex-1 items-center gap-3 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2">
+        <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-slate-950 via-slate-800 to-indigo-700 text-[10px] font-semibold tracking-[0.14em] text-white shadow-sm" aria-hidden="true">
+            IM
+        </span>
+        <span class="min-w-0 truncate">
+            <span class="block truncate text-sm font-semibold text-gray-950">Immobile</span>
+            <span class="block truncate text-[11px] font-medium text-gray-500">Hausverwaltung einfach digital</span>
+        </span>
     </a>
     <button
         type="button"
