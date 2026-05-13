@@ -145,7 +145,7 @@
                 >
                     <div class="pointer-events-none absolute inset-0 z-[1] min-h-[100svh] w-full overflow-hidden" aria-hidden="true">
                         <video
-                            class="absolute inset-0 z-[1] h-full w-full object-cover"
+                            class="absolute inset-0 z-[1] h-full w-full object-cover brightness-[1.02] contrast-[1.02]"
                             src="{{ asset('videos/hero.mp4') }}"
                             autoplay
                             muted
@@ -156,9 +156,10 @@
                         >
                             <source src="{{ asset('videos/hero.mp4') }}" type="video/mp4" />
                         </video>
-                        {{-- Single readable overlay so the picture stays visible --}}
-                        <div class="absolute inset-0 z-[2] bg-gradient-to-b from-slate-950/45 via-slate-950/55 to-slate-950/80"></div>
-                        <div class="absolute inset-0 z-[2] bg-gradient-to-r from-slate-950/70 via-slate-950/20 to-transparent"></div>
+                        {{-- Light wash: keep video clearly visible; avoid stacking multiple dark layers --}}
+                        <div class="absolute inset-0 z-[2] bg-slate-950/20"></div>
+                        {{-- Mobile: soft vertical vignette | Desktop: darker only on the left (typography), right stays brighter for the mockup + video --}}
+                        <div class="absolute inset-0 z-[2] bg-gradient-to-b from-slate-950/50 via-slate-950/15 to-slate-950/40 lg:bg-gradient-to-r lg:from-slate-950/70 lg:via-slate-950/25 lg:to-transparent"></div>
                     </div>
 
                     <div class="relative z-[3] mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -170,10 +171,10 @@
                                 <span class="inline-flex items-center rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm font-semibold text-white backdrop-blur-sm">Made in Germany</span>
                             </div>
 
-                            <h1 id="hero-heading" class="mt-8 text-4xl font-semibold tracking-tight text-white sm:text-5xl sm:leading-[1.08] lg:text-6xl lg:leading-[1.06]">
+                            <h1 id="hero-heading" class="mt-8 text-4xl font-semibold tracking-tight text-white drop-shadow-[0_2px_24px_rgba(0,0,0,0.45)] sm:text-5xl sm:leading-[1.08] lg:text-6xl lg:leading-[1.06]">
                                 Hausverwaltung, Mietabrechnung und Mieterportal in einer Plattform.
                             </h1>
-                            <p class="mt-6 max-w-2xl text-lg leading-8 text-slate-200 sm:text-xl sm:leading-9">
+                            <p class="mt-6 max-w-2xl text-lg leading-8 text-slate-100 sm:text-xl sm:leading-9 drop-shadow-[0_1px_12px_rgba(0,0,0,0.4)]">
                                 Verwalten Sie Mietvertrage, wiederkehrende Rechnungen, Bankimporte und DATEV-ready Exporte strukturiert, nachvollziehbar und fur deutsche Hausverwaltungen entwickelt.
                             </p>
 
