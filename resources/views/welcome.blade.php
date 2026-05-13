@@ -138,19 +138,42 @@
             </header>
 
             <main>
-                <section class="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8 lg:py-24">
-                    <div class="grid gap-14 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.98fr)] lg:items-center">
+                <section
+                    id="hero"
+                    class="relative flex min-h-[100svh] w-full flex-col justify-center overflow-hidden py-20 sm:py-24 lg:py-28"
+                    aria-labelledby="hero-heading"
+                >
+                    <div class="pointer-events-none absolute inset-0 z-[1] min-h-[100svh] w-full overflow-hidden" aria-hidden="true">
+                        <video
+                            class="absolute inset-0 z-[1] h-full w-full object-cover"
+                            src="{{ asset('videos/hero.mp4') }}"
+                            autoplay
+                            muted
+                            loop
+                            playsinline
+                            preload="auto"
+                            aria-hidden="true"
+                        >
+                            <source src="{{ asset('videos/hero.mp4') }}" type="video/mp4" />
+                        </video>
+                        {{-- Single readable overlay so the picture stays visible --}}
+                        <div class="absolute inset-0 z-[2] bg-gradient-to-b from-slate-950/45 via-slate-950/55 to-slate-950/80"></div>
+                        <div class="absolute inset-0 z-[2] bg-gradient-to-r from-slate-950/70 via-slate-950/20 to-transparent"></div>
+                    </div>
+
+                    <div class="relative z-[3] mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+                        <div class="grid gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.98fr)] lg:items-center lg:gap-16">
                         <div class="max-w-3xl">
                             <div class="flex flex-wrap gap-3">
-                                <span class="inline-flex items-center rounded-full border border-emerald-200 bg-emerald-50 px-4 py-2 text-sm font-semibold text-emerald-700">DSGVO-konform</span>
-                                <span class="inline-flex items-center rounded-full border border-indigo-200 bg-indigo-50 px-4 py-2 text-sm font-semibold text-indigo-700">DATEV-ready</span>
-                                <span class="inline-flex items-center rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700">Made in Germany</span>
+                                <span class="inline-flex items-center rounded-full border border-emerald-400/35 bg-emerald-500/15 px-4 py-2 text-sm font-semibold text-emerald-100 backdrop-blur-sm">DSGVO-konform</span>
+                                <span class="inline-flex items-center rounded-full border border-indigo-400/35 bg-indigo-500/15 px-4 py-2 text-sm font-semibold text-indigo-100 backdrop-blur-sm">DATEV-ready</span>
+                                <span class="inline-flex items-center rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm font-semibold text-white backdrop-blur-sm">Made in Germany</span>
                             </div>
 
-                            <h1 class="mt-8 text-4xl font-semibold tracking-tight text-slate-950 sm:text-5xl lg:text-6xl">
+                            <h1 id="hero-heading" class="mt-8 text-4xl font-semibold tracking-tight text-white sm:text-5xl sm:leading-[1.08] lg:text-6xl lg:leading-[1.06]">
                                 Hausverwaltung, Mietabrechnung und Mieterportal in einer Plattform.
                             </h1>
-                            <p class="mt-6 max-w-2xl text-lg leading-8 text-slate-600 sm:text-xl">
+                            <p class="mt-6 max-w-2xl text-lg leading-8 text-slate-200 sm:text-xl sm:leading-9">
                                 Verwalten Sie Mietvertrage, wiederkehrende Rechnungen, Bankimporte und DATEV-ready Exporte strukturiert, nachvollziehbar und fur deutsche Hausverwaltungen entwickelt.
                             </p>
 
@@ -158,31 +181,31 @@
                                 @if (Route::has('register'))
                                     <a
                                         href="{{ route('register') }}"
-                                        class="inline-flex min-h-12 items-center justify-center rounded-full bg-indigo-600 px-6 py-3.5 text-sm font-semibold text-white shadow-xl shadow-indigo-600/20 transition duration-200 hover:-translate-y-0.5 hover:bg-indigo-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2"
+                                        class="inline-flex min-h-12 items-center justify-center rounded-full bg-indigo-600 px-6 py-3.5 text-sm font-semibold text-white shadow-xl shadow-indigo-950/40 transition duration-200 hover:-translate-y-0.5 hover:bg-indigo-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-300 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
                                     >
                                         Kostenlos testen
                                     </a>
                                 @endif
                                 <a
                                     href="#workflow"
-                                    class="inline-flex min-h-12 items-center justify-center rounded-full border border-slate-300 bg-white px-6 py-3.5 text-sm font-semibold text-slate-700 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:border-slate-400 hover:bg-slate-100 hover:text-slate-950 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2"
+                                    class="inline-flex min-h-12 items-center justify-center rounded-full border border-white/25 bg-white/10 px-6 py-3.5 text-sm font-semibold text-white shadow-sm backdrop-blur-sm transition duration-200 hover:-translate-y-0.5 hover:border-white/40 hover:bg-white/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
                                 >
                                     Demo ansehen
                                 </a>
                             </div>
 
-                            <dl class="mt-10 grid gap-4 sm:grid-cols-3">
-                                <div class="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
+                            <dl class="mt-12 grid gap-4 sm:grid-cols-3">
+                                <div class="rounded-3xl bg-white/95 p-5 shadow-lg shadow-slate-950/20 ring-1 ring-white/30 backdrop-blur-sm">
                                     <dt class="text-sm text-slate-500">Offene Mietrechnungen</dt>
                                     <dd class="mt-2 text-2xl font-semibold text-slate-950">124</dd>
                                     <dd class="mt-1 text-sm text-slate-600">mit klarem Status und Zuordnung</dd>
                                 </div>
-                                <div class="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
+                                <div class="rounded-3xl bg-white/95 p-5 shadow-lg shadow-slate-950/20 ring-1 ring-white/30 backdrop-blur-sm">
                                     <dt class="text-sm text-slate-500">Bankimporte</dt>
                                     <dd class="mt-2 text-2xl font-semibold text-slate-950">38</dd>
                                     <dd class="mt-1 text-sm text-slate-600">seit Montag automatisch erkannt</dd>
                                 </div>
-                                <div class="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
+                                <div class="rounded-3xl bg-white/95 p-5 shadow-lg shadow-slate-950/20 ring-1 ring-white/30 backdrop-blur-sm">
                                     <dt class="text-sm text-slate-500">DATEV Export</dt>
                                     <dd class="mt-2 text-2xl font-semibold text-slate-950">bereit</dd>
                                     <dd class="mt-1 text-sm text-slate-600">fur den nachgelagerten Monatsabschluss</dd>
@@ -317,6 +340,7 @@
                                 </div>
                             </section>
                         </div>
+                    </div>
                     </div>
                 </section>
 
