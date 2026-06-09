@@ -1,3 +1,8 @@
+---
+description: Multi tenant rules
+alwaysApply: true
+---
+
 This is a multi-tenant Laravel SaaS project.
 
 Tenant isolation rules:

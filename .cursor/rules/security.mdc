@@ -1,3 +1,8 @@
+---
+description: Security rules
+alwaysApply: true
+---
+
 Security rules:
 
 - Validate all user input.

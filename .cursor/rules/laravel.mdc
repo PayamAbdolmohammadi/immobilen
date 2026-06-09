@@ -1,3 +1,8 @@
+---
+description: Laravel project rules
+alwaysApply: true
+---
+
 You are working on a Laravel SaaS project.
 
 General Laravel rules:
